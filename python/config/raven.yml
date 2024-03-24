@@ -7,7 +7,7 @@
 # log_dir: D:/project/raven/logs
 log_max_bytes: 10485760
 log_backup_count: 5
-data_dir: '/home/valtanix/PycharmProjects/raven/python/data'
+data_dir: '/home/aravindh/PycharmProjects/raven/python/data'
 
 mysql_conn:
   c360_mysql_uri: 'mysql://root:aravindh@127.0.0.1/mysql'
@@ -24,7 +24,7 @@ rest_end_point:
   time_stop: '2018-12-21'
   incremental: false
   dsa_url: 'https://dsaweb-31-datastax-academy.pantheonsite.io/c360/updateC360/index.json'
-  dsa_oauth: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJhdWQiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJqdGkiOiJacmJHQklTRWhpZkdkekNXaVJQU1owcFB5WHdYU19QcG4tYXlMdVA2azlZIiwiZXhwIjoxNTIxODI4MDY4LCJuYmYiOjE1MTkyMzYwNjgsImlhdCI6MTUxOTIzNjA2OCwiZW1haWwiOiJzeXNhZG1pbkBkYXRhc3RheC5jb20iLCJzdWIiOiI3NTgxY2FlOS0yMWZlLTQ4MWEtOTg4Zi01NzEzMWQwOTNkMjUifQ.n2j5MR8B4vM24hr1uFR0Hn_TYoYXJ7uXKg18MUeptfk'
+  dsa_oauth: ''
 
 # Commit every
 mysql_commit_every: 50
