@@ -1,0 +1,8 @@
+---
+project_name: raven
+git_repo: ssh://git@github.com/valtanixgit/raven.git
+git_checkout_dir: ~/projects/raven
+git_from_branch: develop
+git_to_branch: master
+version_file: ~/projects/raven/python/raven/version.py
+tar_file_prefix: raven

@@ -1,0 +1,37 @@
+---
+- name: find the release/tag version number
+  connection: local
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+- debug: var="{{ rel_ver }}"
+
+- name: get stats on the latest link 
+  stat: path="{{ dist_home }}/latest"
+  register: latest_chk 
+
+- name: check if latest directory exists 
+  fail: msg="ERROR - unable to find the latest directory. Checked  {{ dist_home }}/latest " 
+  when: latest_chk.stat.islnk is not defined
+
+- name: check if latest directory is a link 
+  fail: msg="ERROR - latest directory exist but is not a symbolic link. Checked {{ dist_home }}/latest " 
+  when: latest_chk.stat.islnk == False 
+
+- name: building the full directory name for this release
+  command: echo "{{ dist_home }}/release/{{ rel_ver }}/src"
+  register: rel_dir
+
+- name: check if latest is pointing to the correct release 
+  fail: msg="ERROR - latest directory exists, it is a link but, is not pointing to the expected version. Expected - {{ rel_dir.stdout }}. Found -  {{ latest_chk.stat.lnk_source }}. "
+  when: latest_chk.stat.lnk_source != "{{ rel_dir.stdout }}" 
+
+- name: get stats on the logs link 
+  stat: path="{{ dist_home }}/logs"
+  register: logs_chk
+
+- name: check if logs directory is a link 
+  fail: msg="ERROR - logs directory exist but is not a symbolic link. Checked {{ dist_home }}/logs " 
+  when: logs_chk.stat.islnk == False 

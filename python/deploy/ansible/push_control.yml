@@ -1,0 +1,4 @@
+ - name: a playbook to push the control files
+   hosts: batch_server 
+   roles:
+   - push_control

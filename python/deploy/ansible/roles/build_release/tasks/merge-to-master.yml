@@ -1,0 +1,35 @@
+---
+- name: print the git directory where we will checkout the code
+  debug: msg="git checkout dir - {{ git_checkout_dir }}"
+
+- name: print the git branch that we will checkout the code to and MAKE FINAL release from
+  debug: msg="git branch name - {{ git_to_branch }}"
+
+- name: print the git branch FROM WHERE we will merge the code 
+  debug: msg="git will merge from branch - {{ git_from_branch }}"
+
+- name: checkout master branch
+  include: ../../common/tasks/git-checkout.yml git_checkout_copied_to={{ git_checkout_dir }} git_version={{ git_to_branch }} git_repo_name={{ git_repo }}
+
+- name: git merge
+  shell: git merge --no-ff {{ git_from_branch }}
+  args: 
+     chdir: "{{ git_checkout_dir }}"
+
+- name: validating if the merge went ok
+  shell: git diff develop master --name-only
+  args: 
+     chdir: "{{ git_checkout_dir }}"
+  register:
+     gitOutput  
+
+#- name: validating git merge. git diff output should be empty.
+#  debug: var=gitOutput.stdout_lines 
+  
+- name: output shown above from the git diff should be empty
+  pause: prompt="{{ gitOutput.stdout_lines }} Output shown must be empty. Otherwise merge to master did not work right. Press any key to continue or <CTRL>c to stop"  
+
+- name: push merged changes to github
+  shell: git push
+  args: 
+     chdir: "{{ git_checkout_dir }}"

@@ -1,0 +1,32 @@
+---
+- name: find the release/tag version number
+  connection: local
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+
+- name: remove existing links
+  shell: "\\rm -rf {{ item }}"
+  with_items:
+    - "latest"
+    - "logs"
+  args:
+     chdir: "{{ dist_home }}"   
+
+- name: create link to the new released code
+  shell: "ln -s release/{{ rel_ver }}/src latest"
+  args:
+     chdir: "{{ dist_home }}"
+
+- name: create the logs link
+  shell: "ln -s latest/../logs logs"
+  args:
+     chdir: "{{ dist_home }}"
+
+
+
+# - name: exectue all the handlers now 
+#   meta: flush_handlers
+

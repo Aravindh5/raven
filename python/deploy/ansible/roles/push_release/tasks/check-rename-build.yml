@@ -1,0 +1,23 @@
+---
+- name: find the release/tag version number
+  connection: local
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+
+- name: version number that will be unpacked
+  pause: prompt="{{ rel_ver  }} build version will be pushed to remote server. Press any key to continue OR press <CTRL>C to stop now!"
+ 
+- name: check if have already downloaded the same release before  
+  stat: path="{{ dist_home }}/release/{{ rel_ver }}"
+  register: check_build_dir
+
+- name: we have already downloaded this release. Prompt to rename and continue.
+  pause: prompt="WARNING - Release {{ rel_ver }} has already been downloaded and unpacked. Press any key to rename that directory and continue (recommended) OR press  <CTRL>C to stop now!"
+  when: check_build_dir.stat.exists
+
+- name: rename the existing release (if it exists) and continue 
+  shell: "mv {{ dist_home }}/release/{{ rel_ver }} {{ dist_home }}//release/{{ rel_ver }}_{{ timestamp }}" 
+  when: check_build_dir.stat.exists

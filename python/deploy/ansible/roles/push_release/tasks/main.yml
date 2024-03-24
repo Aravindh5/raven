@@ -1,0 +1,18 @@
+---
+- include: prepare.yml
+  tags: prepare
+
+- include: check-rename-build.yml
+  tags: check-rename-build
+
+- include: push-build.yml
+  tags: push-build
+
+- include: unpack-tar-gz.yml
+  tags: unpack-tar-gz
+
+- include: create-links.yml
+  tags: create-links
+
+- include: unpack-confirm.yml
+  tags: unpack-confirm

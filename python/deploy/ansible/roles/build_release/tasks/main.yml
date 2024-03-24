@@ -1,0 +1,21 @@
+---
+- include: pull-latest-code.yml
+  tags: pull-latest-code
+
+- include: confirm-release-tag.yml
+  tags: confirm-release-tag
+
+- include: merge-to-master.yml
+  tags: merge-to-master
+
+- include: prepare-build.yml
+  tags: prepare-build
+
+- include: create-tar-gz.yml
+  tag: create-tar-gz
+
+- include: tag-release.yml
+  tags: tag-release
+
+- include: clean-up.yml
+  tags: clean-up

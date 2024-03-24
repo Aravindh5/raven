@@ -1,0 +1,19 @@
+# inventory - uat 
+
+[batch_server]
+54.67.36.103
+
+[batch_server:vars]
+ansible_ssh_user=integration
+ansible_ssh_private_key_file=~/Projects/cardinal/datastax/aws/integration.pem
+
+c360_mysql_uri=mysql://c360:Stax123@54.67.36.103/c360_dev
+sfdc_mysql_uri=mysql://c360:Stax123@54.67.36.103/Sdexport
+academy_mysql_uri=mysql://c360:Stax123@54.67.36.103/dsa
+
+time_start='2017-03-20'
+time_stop='2018-12-21'
+
+dsa_url='https://dsaweb-31-datastax-academy.pantheonsite.io/c360/updateC360/index.json'
+dsa_oauth='Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJhdWQiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJqdGkiOiJacmJHQklTRWhpZkdkekNXaVJQU1owcFB5WHdYU19QcG4tYXlMdVA2azlZIiwiZXhwIjoxNTIxODI4MDY4LCJuYmYiOjE1MTkyMzYwNjgsImlhdCI6MTUxOTIzNjA2OCwiZW1haWwiOiJzeXNhZG1pbkBkYXRhc3RheC5jb20iLCJzdWIiOiI3NTgxY2FlOS0yMWZlLTQ4MWEtOTg4Zi01NzEzMWQwOTNkMjUifQ.n2j5MR8B4vM24hr1uFR0Hn_TYoYXJ7uXKg18MUeptfk'
+incremental_run='True'

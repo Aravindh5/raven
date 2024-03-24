@@ -1,0 +1,10 @@
+---
+# Create directories if they are missing
+- name: create all required directories
+  file: path={{ item }} state=directory
+  with_items:
+   - "{{ deploy_home }}"
+   - "{{ deploy_home }}/bin"
+   - "{{ deploy_home }}/bin/pid"
+   - "{{ dist_home }}"
+   - "{{ dist_home }}/release"

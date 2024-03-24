@@ -1,0 +1,6 @@
+---
+- include: bash-completion.yml 
+- include: curl.yml
+- include: git.yml
+- include: terminator.yml 
+- include: sublime.yml 

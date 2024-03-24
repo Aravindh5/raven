@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Sample script to run Raven project using Python in a Docker container.
+
+#For Pulling Academy detail from dsa to c360
+#docker run -it --rm --name python_raven -v ~/projects/raven:/data/projects/raven -w /data/projects/raven/python/raven python_raven:ubuntu_1.0 python academy_process_data.py --time_start 2017-12-25 --time_stop 2017-12-30 --academy_mysql_uri 'mysql://c360:Stax123@54.67.36.103/dsa' --incremental False --dsa_url 'https://dsaweb-31-datastax-academy.pantheonsite.io/c360/updateC360/index.json' --dsa_oauth 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJhdWQiOiJodHRwczpcL1wvYWNhZGVteS5kYXRhc3RheC5jb20iLCJqdGkiOiJacmJHQklTRWhpZkdkekNXaVJQU1owcFB5WHdYU19QcG4tYXlMdVA2azlZIiwiZXhwIjoxNTIxODI4MDY4LCJuYmYiOjE1MTkyMzYwNjgsImlhdCI6MTUxOTIzNjA2OCwiZW1haWwiOiJzeXNhZG1pbkBkYXRhc3RheC5jb20iLCJzdWIiOiI3NTgxY2FlOS0yMWZlLTQ4MWEtOTg4Zi01NzEzMWQwOTNkMjUifQ.n2j5MR8B4vM24hr1uFR0Hn_TYoYXJ7uXKg18MUeptfk'
+
+#For Mapping sfdc_id to Academy detail in c360
+#docker run -it --rm --name python_raven -v ~/projects/raven:/data/projects/raven -w /data/projects/raven/python/raven python_raven:ubuntu_1.0 python map_sfdc_process_data.py --c360_mysql_uri 'mysql://c360:Stax123@54.67.36.103/c360_dev' --sfdc_mysql_uri 'mysql://c360:Stax123@54.67.36.103/Sdexport' --academy_mysql_uri 'mysql://c360:Stax123@54.67.36.103/dsa'

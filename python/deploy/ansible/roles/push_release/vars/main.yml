@@ -1,0 +1,5 @@
+---
+git_checkout_dir: ~/projects/raven
+version_file: ~/projects/raven/python/raven/version.py
+timestamp: "{{ lookup('pipe', 'date +%Y_%m_%d_%H%M%S') }}"
+tar_file_prefix: raven

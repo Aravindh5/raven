@@ -1,0 +1,23 @@
+---
+- name: find the release/tag version number
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: confirm git tag version 
+  pause: prompt="This release will be tagged as - {{ awk_output['stdout'] }}.  Please confirm. Press any key to continue"
+
+- name: ready to tag - checking out the branch to which we want to set tag
+  shell: git checkout "{{ git_to_branch }}"
+  args: 
+     chdir: "{{ git_checkout_dir }}" 
+
+- name: tag master branch with the tag label
+  shell: git tag -a {{ awk_output['stdout'] }} -m '{{ awk_output['stdout'] }}'
+  args: 
+     chdir: "{{ git_checkout_dir }}"
+    
+- name: push tagged version to github
+  shell: git push --tags
+  args: 
+     chdir: "{{ git_checkout_dir }}"
+    

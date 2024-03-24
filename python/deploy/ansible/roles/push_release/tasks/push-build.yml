@@ -1,0 +1,18 @@
+---
+- name: find the release/tag version number
+  connection: local
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+
+- name: will push this file to remote server
+  command: echo "{{ tar_file_prefix}}_{{ rel_ver  }}.tar.gz"
+  register: gz_file
+- debug: var="{{ gz_file.stdout }}"  
+ 
+- name: push build to remote server
+  copy: src="{{ item }}" dest="{{ dist_home }}/release" backup=yes
+  with_items:
+   - "{{ git_checkout_dir }}/release/{{ gz_file.stdout }}"

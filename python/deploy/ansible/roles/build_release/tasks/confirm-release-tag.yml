@@ -1,0 +1,11 @@
+---
+- name: find the release/tag version number
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+
+- name: version number that will be built 
+  pause: prompt="{{ rel_ver  }} will be built. Press any key to continue OR press <CTRL>C to stop now!"
+

@@ -1,0 +1,19 @@
+---
+# Common playbook to checkout code from git
+# git_version and git_check_dir must be passed by the calling program
+# Assumes that ssh security is configured. See https://valtanix.atlassian.net/wiki/display/HON/Setting+up+Git+on+Linux
+
+- name: print the git repo
+  debug: msg="Checking out from git repo - {{ git_repo_name }}"
+
+- name: print the git version being checked out
+  debug: msg="Checking out from git version - {{ git_version }}"
+
+- name: print the directory where code is copied to
+  debug: msg="Git will checkout code to- {{ git_checkout_copied_to }}"
+
+- name: check out code from git
+  action: git repo="{{ git_repo_name }}"
+                   dest="{{ git_checkout_copied_to }}"
+                   version="{{ git_version }}"
+                   accept_hostkey=yes

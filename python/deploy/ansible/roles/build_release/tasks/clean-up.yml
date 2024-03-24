@@ -1,0 +1,4 @@
+---
+- name: set back to develop branch
+  include: ../../common/tasks/git-checkout.yml git_checkout_copied_to={{ git_checkout_dir }} git_version={{ git_from_branch }} git_repo_name={{ git_repo }}
+

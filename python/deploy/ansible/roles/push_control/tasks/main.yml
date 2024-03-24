@@ -1,0 +1,4 @@
+---
+# Pushes control files (bin/*)
+- include: control.yml
+  tags: control

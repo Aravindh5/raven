@@ -1,0 +1,18 @@
+# If you see pip upgrade errors run
+#pip install --upgrade pip
+pandas
+numpy
+marshmallow
+tldextract
+Flask
+Flask-SQLAlchemy
+pyyaml
+nose
+requests
+
+#apt-get install
+python-mysqldb
+python-2.7.14
+# For virtualenv inherit from the base
+#MySQL-Python
+

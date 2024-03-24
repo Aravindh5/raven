@@ -1,0 +1,21 @@
+---
+- name: find the release/tag version number
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: build the tar file name
+  command: echo "{{ tar_file_prefix}}_{{ awk_output['stdout']  }}.tar"
+  register: tar_file
+
+- name: building tar file
+  debug: msg="tar file - release/{{ tar_file['stdout'] }}"
+
+- name: create tar file
+  shell: "tar -cvf ../release/{{ tar_file['stdout'] }} {{ awk_output['stdout'] }}"
+  args:
+     chdir: "{{ git_checkout_dir }}/build"
+
+- name: create the gz file
+  shell: "gzip -f {{ tar_file['stdout'] }}"       
+  args:
+     chdir: "{{ git_checkout_dir }}/release"

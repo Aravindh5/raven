@@ -1,0 +1,34 @@
+---
+- name: find the release/tag version number
+  connection: local
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+- name: get the release label from awk output
+  set_fact: rel_ver={{ awk_output.stdout }}
+
+- name: will gunzip this file
+  command: echo "{{ tar_file_prefix}}_{{ rel_ver  }}.tar.gz"
+  register: gz_file
+- debug: var="{{ gz_file.stdout }}"  
+
+- name: gunzip the file
+  shell: "gunzip {{ gz_file.stdout }}"       
+  args:
+     chdir: "{{ dist_home }}/release"
+
+- name: will untar this file
+  command: echo "{{ tar_file_prefix }}_{{ rel_ver  }}.tar"
+  register: tar_file
+- debug: var="{{ tar_file.stdout }}"
+
+# Sometimes -xf is not working on Ubuntu. So using -xvf
+- name: untar the file
+  shell: "tar -xvf {{ tar_file.stdout }} > /dev/null"
+  args:
+     chdir: "{{ dist_home }}/release"
+
+- name: gzip the tar file to save space
+  shell: "gzip -f {{ tar_file.stdout }}"
+  args:
+     chdir: "{{ dist_home }}/release"

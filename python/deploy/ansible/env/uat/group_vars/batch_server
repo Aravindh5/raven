@@ -1,0 +1,8 @@
+# group-vars/batch_server
+---
+# Where code get's pushed (tar.gz)
+dist_home: /data/projects/raven/services
+# Where the code gets installed 
+deploy_home: /data/projects/raven/services
+
+

@@ -1,0 +1,5 @@
+ - name: a playbook to setup a release server for the Broncos (DMEM) project. Assumes Ubuntu 
+   hosts: local
+   connection: local
+   roles:
+   - release_server

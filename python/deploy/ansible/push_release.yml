@@ -1,0 +1,4 @@
+ - name: a playbook to push the latest release  
+   hosts: batch_server 
+   roles:
+   - push_release

@@ -1,0 +1,240 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          raven
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     false
+# Short-Description: raven init script
+# Description:       raven init script
+### END INIT INFO
+
+RAVEN_HOME="/data/projects/raven/services"
+
+C360_MYSQL_URI="{{ c360_mysql_uri }}"
+SFDC_MYSQL_URI="{{ sfdc_mysql_uri }}"
+ACADEMY_MYSQL_URI="{{ academy_mysql_uri }}"
+
+TIME_START="{{ time_start }}"
+TIME_STOP="{{ time_stop }}"
+
+DSA_URL="{{ dsa_url }}"
+DSA_OAUTH="{{ dsa_oauth }}"
+INCREMENTAL_RUN="{{ incremental_run }}"
+
+DESC="Raven service init script"
+NAME="raven"
+RAVEN_USER="integration"
+DATA_DIR="$RAVEN_HOME/data"
+DATA_SET_ALIAS="latest"
+PIDFILE="$RAVEN_HOME/bin/pid/$NAME.pid"
+DSA_SYNC_LIB="academy_process_data.py"
+EMAIL_MAP_LIB="map_sfdc_process_data.py"
+
+# Parameters used to start Python in a Docker Container
+DKER_BIN="/usr/bin/docker"
+DKER_PYTHON_IMAGE="ajegam/python_raven:ubuntu_1.0"
+DKER_MEM="2048m"
+DKER_VIRT_DIR="/data/projects/raven/services:/data/projects/raven/services"
+DKER_WORK_DIR="/data/projects/raven/services/latest"
+DKER_CONT_NAME="python_raven"
+
+
+# Options are: DEBUG, INFO, WARNING, CRITICAL
+LOG_LEVEL="DEBUG"
+
+ERR_BAD_USER="5"
+ERR_CONFIGURATION="10"
+ERR_ALREADY_RUNNING="20"
+ERR_NOTHING_TO_STOP="30"
+
+echo "Executing script: $0."
+
+# Must be run only by the correct user
+if [ $USER != $RAVEN_USER ]; then
+        echo "This script must be run as $RAVEN_USER!"
+        exit $ERR_BAD_USER 
+fi
+
+# Are we properly installed?
+if [ ! -d "$RAVEN_HOME" ]; then
+        echo "$RAVEN_HOME can not be found. Please install $NAME first!"
+        exit $ERR_CONFIGURATION 
+fi
+
+if [ ! -d "$RAVEN_HOME"/latest ]; then
+        echo "$RAVEN_HOME/latest can not be found. Please install $NAME first!"
+        exit $ERR_CONFIGURATION 
+fi
+
+if [ ! -d "$RAVEN_HOME"/bin ]; then
+        echo "$RAVEN_HOME/bin can not be found. Please install $NAME first!"
+        exit $ERR_CONFIGURATION 
+fi
+if [ ! -d "$RAVEN_HOME"/bin/pid ]; then
+        echo "$RAVEN_HOME/bin/pid can not be found. Please install $NAME first!"
+        exit $ERR_CONFIGURATION 
+fi
+
+
+if [ ! -d "$RAVEN_HOME"/logs ]; then
+        echo "$RAVEN_HOME/logs can not be found. Please install $NAME first!"
+        exit $ERR_CONFIGURATION 
+fi
+
+
+if [ ! -e "$RAVEN_HOME"/latest/$LIB ]; then
+    echo "$NAME can not find $LIB in $RAVEN_HOME/latest. Please install $NAME first!"
+    exit $ERR_CONFIGURATION 
+fi
+
+PIDDIR=`dirname $PIDFILE`
+if [ ! -d "$PIDDIR" ]; then
+    mkdir -p "$PIDDIR"
+    if [ ! -d "$PIDDIR" ]; then
+        echo "$PIDDIR can not be found. Please create one!"
+        exit $ERR_CONFIGURATION 
+    fi
+fi
+
+
+do_start_sync_with_dsa()
+{
+
+   LIB=$DSA_SYNC_LIB
+   LOG_FILE="$RAVEN_HOME/logs/$LIB-nohup.log"
+
+   is_running
+   RETVAL=$?
+
+   # Already running
+   if [ $RETVAL == 0 ]; then
+     echo "$LIB is already running. Nothing to start!"
+     exit $ERR_ALREADY_RUNNING 
+   fi
+   echo "Starting $LIB!";
+   echo "$(date)";
+
+   RUN_CMD="$DKER_BIN run -i --rm --name $DKER_CONT_NAME\
+    -m $DKER_MEM\
+    -v $DKER_VIRT_DIR\
+    -w $DKER_WORK_DIR\
+    $DKER_PYTHON_IMAGE python $LIB\
+    --time_start $TIME_START\
+    --time_stop $TIME_STOP\
+    --academy_mysql_uri $ACADEMY_MYSQL_URI\
+    --dsa_url $DSA_URL\
+    --dsa_oauth '$DSA_OAUTH'\
+    --incremental $INCREMENTAL_RUN"
+
+   echo "Running $RUN_CMD .."
+
+   echo "Will run in parallel ..";
+   eval nohup "$RUN_CMD" > $LOG_FILE 2>&1 &
+
+   # write PID
+   echo $! > $PIDFILE
+
+}
+
+do_start_email_map_with_sfdc()
+{
+    LIB=$EMAIL_MAP_LIB
+    LOG_FILE="$RAVEN_HOME/logs/$EMAIL_MAP_LIB-nohup.log"
+
+    is_running
+    RETVAL =$?
+
+    # Already running
+    if [ $RETVAL == 0 ]; then
+        echo "$LIB is already running. Nothing to start!"
+        exit $ERR_ALREADY_RUNNING
+    fi
+
+    echo "Starting $LIB!";
+    echo "$(date)";
+
+    RUN_CMD="$DKER_BIN run -i --rm --name $DKER_CONT_NAME\
+    -m $DKER_MEM\
+    -v $DKER_VIRT_DIR\
+    -w $DKER_WORK_DIR\
+    $DKER_PYTHON_IMAGE python $LIB\
+    --c360_mysql_uri $C360_MYSQL_URI\
+    --sfdc_mysql_uri $SFDC_MYSQL_URI\
+    --academy_mysql_uri $ACADEMY_MYSQL_URI\
+    --data_dir $DATA_DIR"
+
+    echo "Running $RUN_CMD .."
+
+    echo "Will run in parallel ..";
+    eval nohup "$RUN_CMD" > $LOG_FILE 2>&1 &
+
+    # write PID
+    echo $! > $PIDFILE
+
+}
+
+do_stop()
+{
+   is_running
+   RETVAL=$?
+
+   if [ $RETVAL != 0 ]; then
+     echo "$NAME is not running. Nothing to stop!"
+     exit $ERR_NOTHING_TO_STOP 
+   fi
+
+   echo "Will now stop $NAME!"
+   kill -9 `cat $PIDFILE`
+}
+
+
+#
+# Function that returns 0 if process is running, or nonzero if not.
+
+is_running()
+{
+    is_running_silent
+    RETVAL=$?
+    case $RETVAL in
+      0) echo "$NAME is running";;
+      *) echo "$NAME is not running";;
+    esac
+    return $RETVAL
+}
+
+is_running_silent()
+{
+
+    if [ -f "$PIDFILE" ]; then
+        pid=`cat "$PIDFILE"`
+        grep -Eq "$LIB" "/proc/$pid/cmdline" 2>/dev/null && return 0
+        return 1
+    fi
+    return 3
+}
+
+# Check if the newly created file is > in size than the existing one.
+
+case "$1" in
+   start_sync_with_dsa)
+     do_start_sync_with_dsa
+     ;;
+   start_email_map_with_sfdc)
+     do_start_email_map_with_sfdc
+     ;;
+   stop)
+     do_stop
+     ;;
+   status)
+     is_running
+     RETVAL=$?
+     ;;
+    *)
+     echo "Usage: $0 {start_sync_with_dsa|start_email_map_with_sfdc|stop|status}"
+     exit 0
+esac
+
+
+

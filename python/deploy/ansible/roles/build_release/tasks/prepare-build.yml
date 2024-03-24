@@ -1,0 +1,34 @@
+---
+- name: find the release/tag version number
+  shell: awk -F"['|]" '/__version__[ \t]=/{print $2}' {{ version_file }}
+  register: awk_output
+
+# Create directories if they are missing
+- name: create all required directories
+  file: path={{ item }} state=directory
+  with_items:
+   - "{{ git_checkout_dir }}/deploy"
+   - "{{ git_checkout_dir }}/build"
+   - "{{ git_checkout_dir }}/release"
+   - "{{ git_checkout_dir }}/build/{{ awk_output['stdout'] }}"
+   - "{{ git_checkout_dir }}/build/{{ awk_output['stdout'] }}/logs"
+
+
+ # Copy files
+- name: copy source files
+  copy:
+    src: "{{ git_checkout_dir }}/python/{{ project_name }}/"
+    dest: "{{ git_checkout_dir }}/build/{{ awk_output['stdout'] }}/src"
+
+
+- name: copy config files
+  copy:
+    src: "{{ git_checkout_dir }}/python/config"
+    dest: "{{ git_checkout_dir }}/build/{{ awk_output['stdout'] }}"
+
+# We copy the deploy directory also. We might need to use some scripts there to setup the server.
+# Example: deploy/docker/ubuntu-python -- used to build the Docker version on Python
+- name: copy deploy files
+  copy:
+    src: "{{ git_checkout_dir }}/deploy"
+    dest: "{{ git_checkout_dir }}/build/{{ awk_output['stdout'] }}"

@@ -1,0 +1,4 @@
+---
+ - name: terminator (Multi split shell window) 
+   yum: name={{ terminator_url }}
+   sudo: yes

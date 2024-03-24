@@ -1,0 +1,5 @@
+ - name: a playbook to checkout the latest code merge with master and build a standlone executable
+   hosts: build_server
+   connection: local
+   roles:
+   - build_release

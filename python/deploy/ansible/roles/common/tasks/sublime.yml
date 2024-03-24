@@ -1,0 +1,3 @@
+---
+   - name: Sublime Text Editor
+     shell: curl -L git.io/sublimetext | sh 
